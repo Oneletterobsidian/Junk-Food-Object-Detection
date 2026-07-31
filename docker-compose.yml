@@ -1,0 +1,10 @@
+services:
+  detector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # 把本地训练好的权重挂载进容器，路径要跟Dockerfile里的MODEL_PATH对应
+      - ./training/yolov8/best.pt:/app/model/best.pt:ro
+    environment:
+      - MODEL_PATH=/app/model/best.pt
