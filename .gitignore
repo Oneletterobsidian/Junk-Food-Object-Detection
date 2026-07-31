@@ -2,3 +2,5 @@
 "faster_rcnn/best.pt" 
 
 **/best.pt
+__pycache__/
+*.pyc
