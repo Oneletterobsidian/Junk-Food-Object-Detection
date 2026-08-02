@@ -1,9 +1,0 @@
-{
-  "model": "DETR ResNet-50",
-  "epochs": 20,
-  "best_map50": 0.0116,
-  "best_map5095": 0.0055,
-  "fps": 8.7,
-  "train_time_min": 325.0,
-  "final_train_loss": 1.5302
-}

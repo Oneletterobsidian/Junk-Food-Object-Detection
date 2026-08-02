@@ -1,0 +1,55 @@
+name: Deployment CI
+
+# 触发条件：push或PR涉及deployment/相关文件时才跑，
+# 避免training/目录下的改动（跟部署无关）也触发这条流水线
+on:
+  push:
+    branches: [main, feature/deployment]
+    paths:
+      - "deployment/**"
+      - "requirements.txt"
+      - "Dockerfile"
+      - ".github/workflows/deployment-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "deployment/**"
+      - "requirements.txt"
+      - "Dockerfile"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies (CPU-only torch)
+        run: |
+          pip install --no-cache-dir \
+            --extra-index-url https://download.pytorch.org/whl/cpu \
+            -r requirements.txt
+          # 跟Dockerfile里同样的处理：清理opencv的普通版/headless版冲突
+          pip uninstall -y opencv-python opencv-python-headless
+          pip install --no-cache-dir opencv-python-headless
+
+      - name: Run pytest
+        run: pytest deployment/tests/ -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test  # 只有pytest先通过，才会去跑更耗时的Docker build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t junk-food-detector:ci-test .
+
+      - name: Run tests inside the built image
+        run: docker run --rm junk-food-detector:ci-test

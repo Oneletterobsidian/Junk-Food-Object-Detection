@@ -1,8 +1,0 @@
-{
-  "model": "Faster R-CNN ResNet50-FPN",
-  "epochs": 20,
-  "best_map50": 0.8868,
-  "fps": 8.7,
-  "train_time_min": 387.5,
-  "final_train_loss": 0.0621
-}
